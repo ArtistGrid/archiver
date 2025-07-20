@@ -1,7 +1,7 @@
 import os
 import threading
 import time
-from flask import Flask, request, Response, abort, redirect
+from flask import Flask, request, abort
 import requests
 from urllib.parse import unquote
 
@@ -107,8 +107,8 @@ def archive_endpoint(url_to_archive):
     # URL decode the target URL from the path
     target_url = unquote(url_to_archive)
 
-    # Read password from header (X-Password)
-    password = request.headers.get('X-Password', '')
+    # Get password from query parameter
+    password = request.args.get('password', '')
 
     log(f"Incoming archive request for URL: {target_url}")
 
@@ -124,11 +124,8 @@ def archive_endpoint(url_to_archive):
     with lock:
         if current_job and current_job.is_alive():
             log("Cancelling previous archive job due to new request.")
-            # Mark old job as cancelled by clearing current_job,
-            # the thread checks and exits if it is not current_job.
             current_job = None
 
-        # Start new archive thread
         t = threading.Thread(target=archive_job, args=(target_url, password))
         current_job = t
         t.start()
