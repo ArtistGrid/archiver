@@ -100,7 +100,7 @@ def index():
     return html
 
 
-@app.route('/archive/<path:url_to_archive>', methods=['POST'])
+@app.route('/archive/<path:url_to_archive>', methods=['GET'])
 def archive_endpoint(url_to_archive):
     global current_job
 
